@@ -15,12 +15,9 @@ class MyHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Expires', '0')
         super().end_headers()
 
-class ReuseAddrTCPServer(socketserver.TCPServer):
-    allow_reuse_address = True
-
 Handler = MyHTTPRequestHandler
 
-with ReuseAddrTCPServer(("0.0.0.0", PORT), Handler) as httpd:
+with socketserver.TCPServer(("0.0.0.0", PORT), Handler) as httpd:
     print(f"Server running at http://0.0.0.0:{PORT}/")
     print(f"Serving files from: {os.path.abspath(DIRECTORY)}")
     httpd.serve_forever()
