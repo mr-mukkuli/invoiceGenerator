@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Invoice & Receipt Generator</title>
-    <link rel="icon" type="image/x-icon" href="https://favicon.io/favicon.ico">
+    <link rel="icon" type="image/png" href="invoice.png">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 
-<body>
+<body class="dark-mode">
     <div class="container">
         <header class="app-header">
             <div class="header-content">
@@ -20,8 +20,8 @@
                     <p class="subtitle">Create professional invoices and receipts</p>
                 </div>
                 <div class="header-controls">
-                    <button type="button" id="darkModeToggle" class="btn-icon" title="Toggle Dark Mode">
-                        <span class="dark-mode-icon">🌙</span>
+                    <button type="button" id="darkModeToggle" class="btn-icon" title="Toggle Light Mode">
+                        <span class="dark-mode-icon">☀️</span>
                     </button>
                 </div>
             </div>
@@ -29,100 +29,79 @@
 
         <div class="content-wrapper">
             <form id="invoiceForm">
-                <!-- Settings Row -->
-                <div class="settings-row">
-                    <div class="form-group">
-                        <label for="currency">Currency</label>
-                        <select id="currency">
-                            <option value="ZMW" selected>ZMW - Zambian Kwacha (K)</option>
-                            <option value="USD">USD - US Dollar ($)</option>
-                            <option value="EUR">EUR - Euro (€)</option>
-                            <option value="GBP">GBP - British Pound (£)</option>
-                            <option value="ZAR">ZAR - South African Rand (R)</option>
-                        </select>
+                <div class="invoice-details-section">
+                    <div class="section-header">
+                        <h2>Invoice Details</h2>
                     </div>
-                    <div class="form-group">
-                        <label for="template">Template</label>
-                        <select id="template">
-                            <option value="modern" selected>Modern Blue</option>
-                            <option value="classic">Classic Green</option>
-                            <option value="elegant">Elegant Purple</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="logoUpload">Logo</label>
-                        <input type="file" id="logoUpload" accept="image/*">
+                    <div class="form-row-compact">
+                        <div class="form-group">
+                            <label for="invoiceNumber">Invoice #</label>
+                            <input type="text" id="invoiceNumber" value="INV-0001">
+                        </div>
+                        <div class="form-group">
+                            <label for="invoiceDate">Date</label>
+                            <input type="date" id="invoiceDate" required>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Invoice Details -->
-                <div class="section-header">
-                    <h2>Invoice Details</h2>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="invoiceNumber">Invoice #</label>
-                        <input type="text" id="invoiceNumber" value="INV-0001" readonly>
+                <div class="compact-grid">
+                    <div class="business-section">
+                        <div class="section-header">
+                            <h2>Your Business</h2>
+                            <div class="preset-buttons">
+                                <button type="button" id="saveBusinessPreset" class="btn-small">💾</button>
+                                <button type="button" id="loadBusinessPreset" class="btn-small">📂</button>
+                            </div>
+                        </div>
+                        <div class="form-row-compact">
+                            <div class="form-group">
+                                <label for="businessName">Name</label>
+                                <input type="text" id="businessName" placeholder="Company Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="businessEmail">Email</label>
+                                <input type="email" id="businessEmail" placeholder="contact@company.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="businessAddress">Address</label>
+                            <textarea id="businessAddress" rows="1" placeholder="123 Milimo rd, Lusaka"
+                                required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="bankDetails">Bank/Payment Details</label>
+                            <textarea id="bankDetails" rows="1"
+                                placeholder="Bank: ABC Bank, Account: 1234567890, Mobile Money: +260..."></textarea>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="invoiceDate">Date</label>
-                        <input type="date" id="invoiceDate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="dueDate">Due Date</label>
-                        <input type="date" id="dueDate" required>
+
+                    <div class="client-section">
+                        <div class="section-header">
+                            <h2>Bill To</h2>
+                            <div class="preset-buttons">
+                                <button type="button" id="saveClientPreset" class="btn-small">💾</button>
+                                <button type="button" id="loadClientPreset" class="btn-small">📂</button>
+                            </div>
+                        </div>
+                        <div class="form-row-compact">
+                            <div class="form-group">
+                                <label for="clientName">Name</label>
+                                <input type="text" id="clientName" placeholder="Client Name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientEmail">Email</label>
+                                <input type="email" id="clientEmail" placeholder="client@email.com" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="clientAddress">Address</label>
+                            <textarea id="clientAddress" rows="1" placeholder="456 Milimo rd, Lusaka"
+                                required></textarea>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Business Info -->
-                <div class="section-header">
-                    <h2>Your Business</h2>
-                    <div class="preset-buttons">
-                        <button type="button" id="saveBusinessPreset" class="btn-small">💾 Save</button>
-                        <button type="button" id="loadBusinessPreset" class="btn-small">📂 Load</button>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="businessName">Name</label>
-                        <input type="text" id="businessName" placeholder="Your Company Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="businessEmail">Email</label>
-                        <input type="email" id="businessEmail" placeholder="contact@company.com" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="businessAddress">Address</label>
-                    <textarea id="businessAddress" rows="2" placeholder="123 Milimo rd, Lusaka, Zambia"
-                        required></textarea>
-                </div>
-
-                <!-- Client Info -->
-                <div class="section-header">
-                    <h2>Bill To</h2>
-                    <div class="preset-buttons">
-                        <button type="button" id="saveClientPreset" class="btn-small">💾 Save</button>
-                        <button type="button" id="loadClientPreset" class="btn-small">📂 Load</button>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="clientName">Name</label>
-                        <input type="text" id="clientName" placeholder="Client Name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="clientEmail">Email</label>
-                        <input type="email" id="clientEmail" placeholder="client@email.com" required>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label for="clientAddress">Address</label>
-                    <textarea id="clientAddress" rows="2" placeholder="456 Milimo rd, Lusaka, Zambia"
-                        required></textarea>
-                </div>
-
-                <!-- Line Items -->
                 <div class="section-header">
                     <h2>Line Items</h2>
                     <button type="button" id="addLineItem" class="btn-small">+ Add</button>
@@ -137,51 +116,80 @@
                     </div>
                 </div>
 
-                <!-- Tax and Totals -->
-                <div class="totals-section">
-                    <div class="form-group tax-input">
-                        <label for="taxRate">Tax Rate (%)</label>
-                        <input type="number" id="taxRate" min="0" max="100" step="0.01" value="0" placeholder="0.00">
+                <div class="bottom-section">
+                    <div class="left-bottom">
+                        <div class="settings-section-bottom">
+                            <div class="form-group">
+                                <label for="currency">Currency</label>
+                                <select id="currency">
+                                    <option value="ZMW" selected>ZMW (K)</option>
+                                    <option value="USD">USD ($)</option>
+                                    <option value="EUR">EUR (€)</option>
+                                    <option value="GBP">GBP (£)</option>
+                                    <option value="ZAR">ZAR (R)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="template">Template</label>
+                                <select id="template">
+                                    <option value="modern" selected>Grey</option>
+                                    <option value="classic">Green</option>
+                                    <option value="elegant">Purple</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="logoUpload">Logo</label>
+                                <div class="logo-upload-wrapper">
+                                    <input type="file" id="logoUpload" accept="image/*">
+                                    <button type="button" id="removeLogo" class="logo-remove-btn hidden">×</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group notes-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="4" placeholder="Payment terms or notes..."></textarea>
+                        </div>
                     </div>
-                    <div class="totals-display">
-                        <div class="total-row">
-                            <span>Subtotal:</span>
-                            <span id="subtotalDisplay">K 0.00</span>
+
+                    <div class="totals-section">
+                        <div class="form-group tax-input">
+                            <label for="taxRate">Tax Rate (%)</label>
+                            <input type="number" id="taxRate" min="0" max="100" step="0.01" value="15"
+                                placeholder="0.00">
                         </div>
-                        <div class="total-row">
-                            <span>Tax (<span id="taxRateDisplay">0</span>%):</span>
-                            <span id="taxDisplay">K 0.00</span>
-                        </div>
-                        <div class="total-row total-final">
-                            <span>Total:</span>
-                            <span id="totalDisplay">K 0.00</span>
+                        <div class="totals-display">
+                            <div class="total-row">
+                                <span>Subtotal (incl. tax):</span>
+                                <span id="subtotalDisplay">K 0.00</span>
+                            </div>
+                            <div class="total-row tax-deduction">
+                                <span>Tax (<span id="taxRateDisplay">0</span>%) deduction:</span>
+                                <span id="taxDisplay">K 0.00</span>
+                            </div>
+                            <div class="total-row total-final">
+                                <span>Total Amount Due:</span>
+                                <span id="totalDisplay">K 0.00</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Notes -->
-                <div class="form-group">
-                    <label for="notes">Notes</label>
-                    <textarea id="notes" rows="2" placeholder="Payment terms or notes..."></textarea>
-                </div>
-
-                <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button type="button" id="previewInvoice" class="btn btn-secondary">👁️ Preview</button>
-                    <button type="button" id="generateInvoice" class="btn btn-primary">📄 Invoice PDF</button>
-                    <button type="button" id="generateReceipt" class="btn btn-success">✓ Receipt PDF</button>
-                    <button type="button" id="newInvoice" class="btn btn-secondary">+ New</button>
+                    <button type="button" id="previewInvoice" class="btn btn-secondary">Preview</button>
+                    <button type="button" id="generateInvoice" class="btn btn-primary">Invoice</button>
+                    <button type="button" id="generateQuotation" class="btn btn-primary">Quotation</button>
+                    <button type="button" id="generateReceipt" class="btn btn-success">Receipt</button>
+                    <button type="button" id="newInvoice" class="btn btn-secondary">New</button>
                     <button type="reset" class="btn btn-secondary">Clear</button>
                 </div>
             </form>
         </div>
 
         <footer class="app-footer">
-            <p>Invoice & Receipt Generator - ZMW Currency Support</p>
+            <p>Designed & Built by Milimo Mukkuli</p>
         </footer>
     </div>
 
-    <!-- Preview Modal -->
     <div id="previewModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
